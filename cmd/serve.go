@@ -8,12 +8,14 @@ import (
 	"sparrow-plus/config"
 )
 
-
 func Serve() {
-	ValidateEnv()
+	router := http.NewServeMux()
 	config := config.ReadConfig()
-	api.Setup()
+
+	SetupEnv(config)
+	apiServe := api.NewAPIServe(fmt.Sprintf(":%v", config.Port))
+	apiServe.Setup(router)
 
 	log.Printf("Listening on port %v", config.Port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", config.Port), nil))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", config.Port), router))
 }

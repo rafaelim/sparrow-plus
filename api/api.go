@@ -4,9 +4,16 @@ import (
 	"net/http"
 )
 
-func Setup() {
+type APIServe struct {
+	addr string
+}
 
-	http.HandleFunc("GET /{videoName}/", playlist)
-	http.HandleFunc("GET /{videoName}/{segment}", segment)
-	http.HandleFunc("GET /items", fileList)
+func NewAPIServe(addr string) *APIServe {
+	return &APIServe{
+		addr: addr,
+	}
+}
+
+func (s *APIServe) Setup(router *http.ServeMux) {
+	s.VideoStreamHandlers(router)
 }

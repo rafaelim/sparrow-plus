@@ -3,10 +3,11 @@ package cmd
 import (
 	"log"
 	"os/exec"
+	"sparrow-plus/config"
 	"sparrow-plus/hls"
 )
 
-func ValidateEnv() {
+func SetupEnv(config *config.Config) {
 	ffmpeg, ffmpegerr := exec.LookPath("ffmpeg")
 	if ffmpegerr != nil {
 		log.Fatalf("ffmpeg was not found %v", ffmpegerr)
@@ -19,4 +20,5 @@ func ValidateEnv() {
 
 	hls.FFMpeg = ffmpeg
 	hls.FFProbe = ffprobe
+	hls.RootDir = config.RootDir
 }
