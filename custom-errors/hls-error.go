@@ -8,7 +8,7 @@ type HLSError struct {
 }
 
 func (r *HLSError) Error() string {
-	return fmt.Sprintf("message: %v reason: %v", r.Message, r.Reason)
+	return fmt.Sprintf("%v; Reason: %v", r.Message, r.Reason)
 }
 
 func NewHLSError(message, reason string) *HLSError {

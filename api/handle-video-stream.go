@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"path/filepath"
+	customerrors "sparrow-plus/custom-errors"
 	"sparrow-plus/hls"
 	"strconv"
 )
@@ -18,7 +20,18 @@ func handlePlaylist(w http.ResponseWriter, r *http.Request) error {
 	slog.Info("Init playlist handler", "video", videoName)
 
 	template := fmt.Sprintf("%v://%v/api/%v/segments/{{.Resolution}}/{{.Segment}}/", "http", r.Host, videoName)
-	return hls.WritePlaylist(template, fmt.Sprintf("%v%v", hls.RootDir, videoName), 1080, w)
+
+	err := hls.WritePlaylist(template, filepath.Join(hls.RootDir, videoName), 1080, w)
+
+	if err != nil {
+		return customerrors.NewRequestError(
+			http.StatusBadRequest,
+			err.Error(),
+			"FAILED_TO_CREATE_PLAYLIST",
+		)
+	}
+
+	return nil
 }
 
 func handleSegment(w http.ResponseWriter, r *http.Request) error {
@@ -27,5 +40,15 @@ func handleSegment(w http.ResponseWriter, r *http.Request) error {
 	resolution, _ := strconv.ParseInt(r.PathValue("resolution"), 0, 64)
 	slog.Info("Init segment handler", "video", videoName, "resolution", resolution, "segment", segment)
 
-	return hls.WriteSegment(fmt.Sprintf("%v%v", hls.RootDir, videoName), segment, resolution, w)
+	err := hls.WriteSegment(filepath.Join(hls.RootDir, videoName), segment, resolution, w)
+
+	if err != nil {
+		return customerrors.NewRequestError(
+			http.StatusBadRequest,
+			err.Error(),
+			"FAILED_TO_CREATE_SEGMENT",
+		)
+	}
+
+	return nil
 }
