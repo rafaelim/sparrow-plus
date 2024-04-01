@@ -11,15 +11,15 @@ import (
 )
 
 func (s *APIServe) VideoStreamHandlers(router *http.ServeMux) {
-	router.HandleFunc("GET /api/{videoName}", withErrorHandling(handlePlaylist))
-	router.HandleFunc("GET /api/{videoName}/segments/{resolution}/{segment}/", withErrorHandling(handleSegment))
+	router.HandleFunc("GET /api/stream/{videoName}", withErrorHandling(handlePlaylist))
+	router.HandleFunc("GET /api/stream/{videoName}/segments/{resolution}/{segment}/", withErrorHandling(handleSegment))
 }
 
 func handlePlaylist(w http.ResponseWriter, r *http.Request) error {
 	videoName := r.PathValue("videoName")
 	slog.Info("Init playlist handler", "video", videoName)
 
-	template := fmt.Sprintf("%v://%v/api/%v/segments/{{.Resolution}}/{{.Segment}}/", "http", r.Host, videoName)
+	template := fmt.Sprintf("%v://%v/api/stream/%v/segments/{{.Resolution}}/{{.Segment}}/", "http", r.Host, videoName)
 
 	err := hls.WritePlaylist(template, filepath.Join(hls.RootDir, videoName), 1080, w)
 

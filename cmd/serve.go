@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"sparrow-plus/api"
 	"sparrow-plus/config"
+
+	"github.com/rs/cors"
 )
 
 func Serve() {
@@ -13,9 +15,16 @@ func Serve() {
 	config := config.ReadConfig()
 
 	SetupEnv(config)
-	apiServe := api.NewAPIServe(fmt.Sprintf(":%v", config.Port))
+	database := SetupDatabase()
+	apiServe := api.NewAPIServe("", database)
 	apiServe.Setup(router)
 
+	handler := cors.Default().Handler(router)
+	serve := &http.Server{
+		Addr: fmt.Sprintf(":%v", config.Port),
+		Handler: handler,
+	}
+	
 	log.Printf("Listening on port %v", config.Port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", config.Port), router))
+	log.Fatal(serve.ListenAndServe())
 }
