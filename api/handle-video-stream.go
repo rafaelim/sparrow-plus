@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -12,6 +13,8 @@ import (
 
 func (s *APIServe) VideoStreamHandlers(router *http.ServeMux) {
 	router.HandleFunc("GET /api/stream/{videoName}", withErrorHandling(handlePlaylist))
+	router.HandleFunc("GET /api/stream/info/{videoName}", withErrorHandling(handleVideoInfo))
+	router.HandleFunc("GET /api/stream/subtitles/{videoName}/{subIndex}", withErrorHandling(handleSubtitles))
 	router.HandleFunc("GET /api/stream/{videoName}/segments/{resolution}/{segment}/", withErrorHandling(handleSegment))
 }
 
@@ -47,6 +50,44 @@ func handleSegment(w http.ResponseWriter, r *http.Request) error {
 			http.StatusBadRequest,
 			err.Error(),
 			"FAILED_TO_CREATE_SEGMENT",
+		)
+	}
+
+	return nil
+}
+
+func handleVideoInfo(w http.ResponseWriter, r *http.Request) error {
+	videoName := r.PathValue("videoName")
+	slog.Info("Init video info handler", "video", videoName)
+
+	videoInfo, err := hls.GetVideoInfo(filepath.Join(hls.RootDir, videoName))
+
+	if err != nil {
+		fmt.Println(err)
+		return customerrors.NewRequestError(
+			http.StatusBadRequest,
+			err.Error(),
+			"FAILED_TO_GET_VIDEO_INFO",
+		)
+	}
+
+	json.NewEncoder(w).Encode(videoInfo)
+
+	return nil
+}
+func handleSubtitles(w http.ResponseWriter, r *http.Request) error {
+	videoName := r.PathValue("videoName")
+	subIndex, _ := strconv.Atoi(r.PathValue("subIndex"))
+	slog.Info("Init subtitles handler", "video", videoName, "subIndex", subIndex)
+
+	err := hls.WriteSubtitles(filepath.Join(hls.RootDir, videoName), subIndex, w)
+
+	if err != nil {
+		fmt.Println(err)
+		return customerrors.NewRequestError(
+			http.StatusBadRequest,
+			err.Error(),
+			"FAILED_TO_CREATE_SUBTITLES",
 		)
 	}
 

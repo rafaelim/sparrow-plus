@@ -32,7 +32,7 @@ func WriteSegment(video string, segment, resolution int64, w io.Writer) error {
 
 	if err != nil {
 		return customerrors.NewHLSError(
-			fmt.Sprintf("Failed to create playlist for the video %v", video),
+			fmt.Sprintf("Failed to create segment for the video %v", video),
 			"COMMAND_FAILED",
 		)
 	}

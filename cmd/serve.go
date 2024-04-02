@@ -19,7 +19,7 @@ func Serve() {
 	apiServe := api.NewAPIServe("", database)
 	apiServe.Setup(router)
 
-	handler := cors.Default().Handler(router)
+	handler := cors.AllowAll().Handler(router)
 	serve := &http.Server{
 		Addr: fmt.Sprintf(":%v", config.Port),
 		Handler: handler,
