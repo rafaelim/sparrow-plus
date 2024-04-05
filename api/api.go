@@ -3,8 +3,8 @@ package api
 import (
 	"database/sql"
 	"net/http"
-	"sparrow-plus/services/category"
 	"sparrow-plus/services/movie"
+	"sparrow-plus/services/show"
 )
 
 type APIServe struct {
@@ -22,11 +22,11 @@ func NewAPIServe(addr string, db *sql.DB) *APIServe {
 func (s *APIServe) Setup(router *http.ServeMux) {
 	s.VideoStreamHandlers(router)
 
-	categoryStore := category.NewStore(s.db)
-	categoryHandler := category.NewHandler(categoryStore)
-	categoryHandler.RegisterRoutes(router)
-
 	movieStore := movie.NewStore(s.db)
 	movieHandler := movie.NewHandler(movieStore)
 	movieHandler.RegisterRoutes(router)
+
+	showStore := show.NewStore(s.db)
+	showHandler := show.NewHandler(showStore)
+	showHandler.RegisterRoutes(router)
 }
