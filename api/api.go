@@ -3,6 +3,7 @@ package api
 import (
 	"database/sql"
 	"net/http"
+	"sparrow-plus/services/episode"
 	"sparrow-plus/services/movie"
 	"sparrow-plus/services/show"
 )
@@ -27,6 +28,7 @@ func (s *APIServe) Setup(router *http.ServeMux) {
 	movieHandler.RegisterRoutes(router)
 
 	showStore := show.NewStore(s.db)
-	showHandler := show.NewHandler(showStore)
+	episodeStore := episode.NewStore(s.db)
+	showHandler := show.NewHandler(showStore, episodeStore)
 	showHandler.RegisterRoutes(router)
 }

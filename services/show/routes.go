@@ -5,21 +5,26 @@ import (
 	"net/http"
 	"sparrow-plus/types"
 	"sparrow-plus/utils"
+	"strconv"
 )
 
 type Handler struct {
-	store types.ShowStore
+	store        types.ShowStore
+	episodeStore types.EpisodeStore
 }
 
-func NewHandler(store types.ShowStore) *Handler {
-	return &Handler{store: store}
+func NewHandler(store types.ShowStore, episodeStore types.EpisodeStore) *Handler {
+	return &Handler{store: store, episodeStore: episodeStore}
 }
 
 func (h *Handler) RegisterRoutes(router *http.ServeMux) {
 	router.HandleFunc("GET /api/shows", h.handleGetShows)
 	router.HandleFunc("GET /api/shows/{showId}", h.handleGetShowById)
 
-	router.HandleFunc("POST /api/shows", h.handleCreateProduct)
+	router.HandleFunc("POST /api/shows", h.handleCreateShow)
+
+	router.HandleFunc("GET /api/shows/episodes", h.handleGetEpisodes)
+	router.HandleFunc("GET /api/shows/episodes/{episodeId}", h.handleGetEpisodeById)
 }
 
 func (h *Handler) handleGetShows(w http.ResponseWriter, r *http.Request) {
@@ -51,7 +56,7 @@ func (h *Handler) handleGetShowById(w http.ResponseWriter, r *http.Request) {
 	utils.WriteJSON(w, http.StatusOK, show)
 }
 
-func (h *Handler) handleCreateProduct(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) handleCreateShow(w http.ResponseWriter, r *http.Request) {
 	var show types.CreateShowPayload
 	if err := utils.ParseJSON(r, &show); err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)
@@ -65,4 +70,31 @@ func (h *Handler) handleCreateProduct(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.WriteJSON(w, http.StatusCreated, show)
+}
+
+func (h *Handler) handleGetEpisodes(w http.ResponseWriter, r *http.Request) {
+	showId := r.PathValue("showId")
+	season, _ := strconv.Atoi(r.PathValue("season"))
+
+	episodes, err := h.episodeStore.GetEpisodes(showId, season)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	utils.WriteJSON(w, http.StatusOK, episodes)
+}
+
+func (h *Handler) handleGetEpisodeById(w http.ResponseWriter, r *http.Request) {
+	episodeId := r.PathValue("episodeId")
+
+	episode, err := h.episodeStore.GetEpisodeById(episodeId)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	utils.WriteJSON(w, http.StatusOK, episode)
 }

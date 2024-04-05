@@ -90,7 +90,6 @@ func (s *Store) createMoviesTable() {
 			movieId    VARCHAR(36) PRIMARY KEY,
 			name       VARCHAR(255) NOT NULL,
 			filePath   VARCHAR(128) NOT NULL,
-			categoryId VARCHAR(128) NOT NULL,
 			createdAt  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			updatedAt  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			deletedAt  TIMESTAMP

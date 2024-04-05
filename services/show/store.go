@@ -93,7 +93,6 @@ func (s *Store) createShowsTable() {
 			name       VARCHAR(255) NOT NULL,
 			seasons    INT NOT NULL,
 			filePath   VARCHAR(128) NOT NULL,
-			categoryId VARCHAR(128) NOT NULL,
 			createdAt  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			updatedAt  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			deletedAt  TIMESTAMP
