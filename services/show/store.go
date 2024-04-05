@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"log"
 	"sparrow-plus/types"
+
+	"github.com/google/uuid"
 )
 
 type Store struct {
@@ -52,11 +54,11 @@ func (s *Store) GetShowById(showId string) (*types.Show, error) {
 
 func (s *Store) CreateShow(show types.CreateShowPayload) error {
 	_, err := s.db.Exec(
-		"INSERT INTO shows (name seasons, filePath, categoryId) VALUES (?, ?, ?, ?)",
+		"INSERT INTO shows (showId, name seasons, filePath) VALUES (?, ?, ?, ?)",
+		uuid.New(),
 		show.Name,
 		show.Seasons,
 		show.FilePath,
-		show.CategoryId,
 	)
 	if err != nil {
 		return err
@@ -72,7 +74,6 @@ func scanRowsIntoShow(rows *sql.Rows) (*types.Show, error) {
 		&show.Name,
 		&show.Seasons,
 		&show.FilePath,
-		&show.CategoryId,
 		&show.CreatedAt,
 		&show.UpdatedAt,
 		&show.DeletedAt,
@@ -87,17 +88,16 @@ func scanRowsIntoShow(rows *sql.Rows) (*types.Show, error) {
 
 func (s *Store) createShowsTable() {
 	_, err := s.db.Exec(`
-	CREATE TABLE IF NOT EXISTS "shows" (
-		showId     VARCHAR(36) PRIMARY KEY,
-		name       VARCHAR(255) NOT NULL,
-		seasons    INT NOT NULL,
-		filePath   VARCHAR(128) NOT NULL,
-		categoryId VARCHAR(128) NOT NULL,
-		createdAt  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		updatedAt  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		deletedAt  TIMESTAMP,
-		FOREIGN KEY(categoryId) REFERENCES categories(categoryId)
-	)
+		CREATE TABLE IF NOT EXISTS "shows" (
+			showId     VARCHAR(36) PRIMARY KEY,
+			name       VARCHAR(255) NOT NULL,
+			seasons    INT NOT NULL,
+			filePath   VARCHAR(128) NOT NULL,
+			categoryId VARCHAR(128) NOT NULL,
+			createdAt  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			updatedAt  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			deletedAt  TIMESTAMP
+		)
 	`)
 
 	if err != nil {

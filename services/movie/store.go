@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"log"
 	"sparrow-plus/types"
+
+	"github.com/google/uuid"
 )
 
 type Store struct {
@@ -52,10 +54,10 @@ func (s *Store) GetMovieById(movieId string) (*types.Movie, error) {
 
 func (s *Store) CreateMovie(movie types.CreateMoviePayload) error {
 	_, err := s.db.Exec(
-		"INSERT INTO movies (name, filePath, categoryId) VALUES (?, ?, ?)",
+		"INSERT INTO movies (movieId, name, filePath) VALUES (?, ?, ?)",
+		uuid.New(),
 		movie.Name,
 		movie.FilePath,
-		movie.CategoryId,
 	)
 	if err != nil {
 		return err
@@ -70,7 +72,6 @@ func scanRowsIntoMovie(rows *sql.Rows) (*types.Movie, error) {
 		&movie.MovieId,
 		&movie.Name,
 		&movie.FilePath,
-		&movie.CategoryId,
 		&movie.CreatedAt,
 		&movie.UpdatedAt,
 		&movie.DeletedAt,
@@ -85,16 +86,15 @@ func scanRowsIntoMovie(rows *sql.Rows) (*types.Movie, error) {
 
 func (s *Store) createMoviesTable() {
 	_, err := s.db.Exec(`
-	CREATE TABLE IF NOT EXISTS "movies" (
-		movieId    VARCHAR(36) PRIMARY KEY,
-		name       VARCHAR(255) NOT NULL,
-		filePath   VARCHAR(128) NOT NULL,
-		categoryId VARCHAR(128) NOT NULL,
-		createdAt  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		updatedAt  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		deletedAt  TIMESTAMP,
-		FOREIGN KEY(categoryId) REFERENCES categories(categoryId)
-	)
+		CREATE TABLE IF NOT EXISTS "movies" (
+			movieId    VARCHAR(36) PRIMARY KEY,
+			name       VARCHAR(255) NOT NULL,
+			filePath   VARCHAR(128) NOT NULL,
+			categoryId VARCHAR(128) NOT NULL,
+			createdAt  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			updatedAt  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			deletedAt  TIMESTAMP
+		)
 	`)
 
 	if err != nil {
