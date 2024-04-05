@@ -1,4 +1,4 @@
 videos/
-config.json
+.env
 
 *.db

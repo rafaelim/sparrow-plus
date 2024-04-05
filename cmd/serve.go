@@ -4,15 +4,13 @@ import (
 	"fmt"
 	"log"
 	"sparrow-plus/cmd/api"
-	"sparrow-plus/config"
+	configs "sparrow-plus/config"
 )
 
 func Serve() {
-	config := config.ReadConfig()
-
-	SetupEnv(config)
-	database := SetupDatabase()
-	apiServe := api.NewAPIServe(fmt.Sprintf(":%v", config.Port), database)
+	SetupEnv()
+	database := SetupDatabase(configs.Envs.DBName)
+	apiServe := api.NewAPIServe(fmt.Sprintf(":%v", configs.Envs.Port), database)
 
 	if err := apiServe.Run(); err != nil {
 		log.Fatal(err)

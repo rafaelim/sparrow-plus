@@ -1,28 +1,32 @@
-package config
+package configs
 
 import (
-	"encoding/json"
-	"log"
+	"fmt"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
-	Port string `json:"port"`
-	RootDir string `json:"rootDir"`
+	Port   string
+	DBName string
 }
 
-func ReadConfig() *Config {
-	encondedConfig, err := os.ReadFile("./config.json")
+var Envs = initConfig()
 
-	if err != nil {
-		log.Fatalf("No config file was found %v", err)
+func initConfig() Config {
+	godotenv.Load()
+
+	return Config{
+		Port:   getEnv("PORT", "3000"),
+		DBName: fmt.Sprintf("./%v", getEnv("DB_NAME", "sparrow-plus.db")),
 	}
-	var config *Config
-	converr := json.Unmarshal(encondedConfig, &config)
+}
 
-	if converr != nil {
-		log.Fatalf("Failed to convert config file %v", converr)
+func getEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
 	}
 
-	return config
+	return fallback
 }

@@ -8,9 +8,9 @@ import (
 	_ "github.com/ncruces/go-sqlite3/embed"
 )
 
-func SetupDatabase() *sql.DB {
+func SetupDatabase(dbUrl string) *sql.DB {
 	dbConfig := db.SQLiteDB{
-		Url: "./sparrow-plus.db",
+		Url: dbUrl,
 	}
 
 	db := db.NewSQLiteStorage(dbConfig)
