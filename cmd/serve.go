@@ -3,28 +3,18 @@ package cmd
 import (
 	"fmt"
 	"log"
-	"net/http"
-	"sparrow-plus/api"
+	"sparrow-plus/cmd/api"
 	"sparrow-plus/config"
-
-	"github.com/rs/cors"
 )
 
 func Serve() {
-	router := http.NewServeMux()
 	config := config.ReadConfig()
 
 	SetupEnv(config)
 	database := SetupDatabase()
-	apiServe := api.NewAPIServe("", database)
-	apiServe.Setup(router)
+	apiServe := api.NewAPIServe(fmt.Sprintf(":%v", config.Port), database)
 
-	handler := cors.AllowAll().Handler(router)
-	serve := &http.Server{
-		Addr: fmt.Sprintf(":%v", config.Port),
-		Handler: handler,
+	if err := apiServe.Run(); err != nil {
+		log.Fatal(err)
 	}
-	
-	log.Printf("Listening on port %v", config.Port)
-	log.Fatal(serve.ListenAndServe())
 }
