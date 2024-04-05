@@ -1,23 +1,27 @@
 package api
 
 import (
+	"database/sql"
 	"net/http"
-	"sparrow-plus/db"
+	"sparrow-plus/services/category"
 )
 
 type APIServe struct {
 	addr string
-	d *db.DB
+	db   *sql.DB
 }
 
-func NewAPIServe(addr string, d *db.DB) *APIServe {
+func NewAPIServe(addr string, db *sql.DB) *APIServe {
 	return &APIServe{
 		addr: addr,
-		d: d,
+		db:   db,
 	}
 }
 
 func (s *APIServe) Setup(router *http.ServeMux) {
 	s.VideoStreamHandlers(router)
-	s.CategoriesHandlers(router)
+
+	categoryStore := category.NewStore(s.db)
+	categoryHandler := category.NewHandler(categoryStore)
+	categoryHandler.RegisterRoutes(router)
 }

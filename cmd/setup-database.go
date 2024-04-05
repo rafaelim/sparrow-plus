@@ -1,17 +1,19 @@
 package cmd
 
 import (
+	"database/sql"
 	"sparrow-plus/db"
 
 	_ "github.com/ncruces/go-sqlite3/driver"
 	_ "github.com/ncruces/go-sqlite3/embed"
 )
 
-func SetupDatabase() *db.DB {
-	var sqlite db.SQLiteDB
+func SetupDatabase() *sql.DB {
+	dbConfig := db.SQLiteDB{
+		Url: "./sparrow-plus.db",
+	}
 
-	db := sqlite.NewDatabase()
-	// db.SetupCategories()
+	db := db.NewSQLiteStorage(dbConfig)
 
 	return db
 }
