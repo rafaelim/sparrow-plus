@@ -25,5 +25,6 @@
 	}
 </script>
 
-<video bind:this={scrollbox} controls={true} class="vjs-matrix video-js"> </video>
+<!-- svelte-ignore a11y-media-has-caption -->
+<video bind:this={scrollbox} controls={true} class="vjs-matrix video-js" />
 <div id="audioTrackControl"></div>
