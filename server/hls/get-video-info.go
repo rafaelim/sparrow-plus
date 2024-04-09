@@ -15,9 +15,10 @@ type VideoInfo struct {
 }
 
 type StreamInfo struct {
-	Index      float64 `json:"streamIndex"`
-	Codec_type string  `json:"codecType"`
-	Language   string  `json:"language"`
+	Index        float64 `json:"streamIndex"`
+	Codec_type   string  `json:"codecType"`
+	Language     string  `json:"language"`
+	LanguageName string  `json:"languageName"`
 }
 
 func GetVideoInfo(path string) (*VideoInfo, error) {
@@ -77,10 +78,15 @@ func GetStreams(info map[string]interface{}) []StreamInfo {
 			continue
 		}
 
+		languageName, ok := streamInfo["tags"].(map[string]interface{})["title"].(string)
+		if !ok {
+			languageName = "Unknown"
+		}
 		streamsInfo = append(streamsInfo, StreamInfo{
-			Index:      streamInfo["index"].(float64),
-			Codec_type: streamInfo["codec_type"].(string),
-			Language:   language,
+			Index:        streamInfo["index"].(float64),
+			Codec_type:   streamInfo["codec_type"].(string),
+			Language:     language,
+			LanguageName: languageName,
 		})
 	}
 	return streamsInfo
@@ -92,7 +98,7 @@ func GetFFProbeJson(path string) (map[string]interface{}, error) {
 		"-v",
 		"quiet",
 		"-show_streams",
-		"-show_entries", "stream=index,codec_type,codec_name:stream_tags=language",
+		"-show_entries", "stream=index,codec_type,codec_name:stream_tags=language,title",
 		"-show_format",
 		"-print_format", "json",
 	}

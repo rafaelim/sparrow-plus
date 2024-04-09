@@ -11,13 +11,13 @@
 			html5: {
 				nativeTextTracks: false,
 				nativeAudioTracks: false,
-				vhs: {
+				hls: {
 					overrideNative: true
 				}
 			},
 			sources: [
 				{
-					src: 'http://localhost:3000/api/stream/video.mkv',
+					src: 'http://localhost:3000/api/stream/<filename>/master',
 					type: 'application/x-mpegURL'
 				}
 			]

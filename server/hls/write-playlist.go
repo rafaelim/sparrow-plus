@@ -57,3 +57,42 @@ func WritePlaylist(urlTemplate string, file string, resolution int, w io.Writer)
 	fmt.Fprint(w, "#EXT-X-ENDLIST\n")
 	return nil
 }
+
+func WriteSinglePlaylist(urlTemplate string, file string, resolution int, w io.Writer) error {
+	t := template.Must(template.New("urlTemplate").Parse(urlTemplate))
+
+	vinfo, err := GetVideoInfo(file)
+
+	if err != nil {
+		return customerrors.NewHLSError(
+			"Failed to load video info",
+			"VIDEO_INFO_NOT_FOUND",
+		)
+	}
+
+	duration := vinfo.Duration
+
+	getUrl := func(segmentIndex int) string {
+		buf := new(bytes.Buffer)
+		t.Execute(buf, struct {
+			Resolution int
+			Segment    int
+		}{
+			resolution,
+			segmentIndex,
+		})
+		return buf.String()
+	}
+
+	fmt.Fprint(w, "#EXTM3U\n")
+	fmt.Fprint(w, "#EXT-X-VERSION:3\n")
+	fmt.Fprint(w, "#EXT-X-MEDIA-SEQUENCE:0\n")
+	fmt.Fprint(w, "#EXT-X-ALLOW-CACHE:YES\n")
+	fmt.Fprint(w, "#EXT-X-TARGETDURATION:"+fmt.Sprintf("%.f", duration)+"\n")
+	fmt.Fprint(w, "#EXT-X-PLAYLIST-TYPE:VOD\n")
+
+	fmt.Fprintf(w, "#EXTINF: %f,\n", duration)
+	fmt.Fprintf(w, getUrl(0)+"\n")
+	fmt.Fprint(w, "#EXT-X-ENDLIST\n")
+	return nil
+}
