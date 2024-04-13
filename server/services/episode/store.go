@@ -65,12 +65,12 @@ func (s *Store) GetEpisodeById(episodeId string) (*types.Episode, error) {
 
 func (s *Store) CreateEpisode(episode types.CreateEpisodePayload) error {
 	_, err := s.db.Exec(
-		"INSERT INTO episodes (episodeId, name seasons, showId, filePath) VALUES (?, ?, ?, ?, ?)",
+		"INSERT INTO episodes (episodeId, name seasons, showId, path) VALUES (?, ?, ?, ?, ?)",
 		uuid.New(),
 		episode.Name,
 		episode.Seasons,
 		episode.ShowId,
-		episode.FilePath,
+		episode.Path,
 	)
 	if err != nil {
 		return err
@@ -86,7 +86,7 @@ func scanRowsIntoEpisode(rows *sql.Rows) (*types.Episode, error) {
 		&episode.Name,
 		&episode.Seasons,
 		&episode.ShowId,
-		&episode.FilePath,
+		&episode.Path,
 		&episode.CreatedAt,
 		&episode.UpdatedAt,
 		&episode.DeletedAt,
@@ -106,7 +106,7 @@ func (s *Store) createEpisodesTable() {
 			name       VARCHAR(255) NOT NULL,
 			season     INT NOT NULL,
 			showId 	   VARCHAR(36) NOT NULL,
-			filePath   VARCHAR(128) NOT NULL,
+			path   VARCHAR(128) NOT NULL,
 			createdAt  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			updatedAt  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			deletedAt  TIMESTAMP,

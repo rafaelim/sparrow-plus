@@ -7,7 +7,7 @@ type Episode struct {
 	ShowId    string     `json:"showId"`
 	Name      string     `json:"name"`
 	Seasons   int        `json:"seasons"`
-	FilePath  string     `json:"filePath"`
+	Path      string     `json:"path"`
 	CreatedAt time.Time  `json:"createdAt"`
 	UpdatedAt time.Time  `json:"updatedAt"`
 	DeletedAt *time.Time `json:"deletedAt"`
@@ -18,7 +18,7 @@ type CreateEpisodePayload struct {
 	ShowId    string `json:"showId"`
 	Name      string `json:"name"`
 	Seasons   int    `json:"seasons"`
-	FilePath  string `json:"filePath"`
+	Path      string `json:"path"`
 }
 
 type EpisodeStore interface {

@@ -28,9 +28,6 @@ func (s *APIServe) Run() error {
 	router := http.NewServeMux()
 	handler := cors.AllowAll().Handler(router)
 
-	streamHandler := stream.NewHandler()
-	streamHandler.RegisterRoutes(router)
-
 	movieStore := movie.NewStore(s.db)
 	movieHandler := movie.NewHandler(movieStore)
 	movieHandler.RegisterRoutes(router)
@@ -39,6 +36,9 @@ func (s *APIServe) Run() error {
 	episodeStore := episode.NewStore(s.db)
 	showHandler := show.NewHandler(showStore, episodeStore)
 	showHandler.RegisterRoutes(router)
+
+	streamHandler := stream.NewHandler(movieStore, episodeStore)
+	streamHandler.RegisterRoutes(router)
 
 	log.Printf("Listening on %v", s.addr)
 

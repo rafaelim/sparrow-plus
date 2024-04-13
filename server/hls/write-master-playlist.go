@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-func WriteMasterPlaylist(path, playlistPath string, w io.Writer) error {
+func WriteMasterPlaylist(path string, w io.Writer) error {
 	videoInfo, err := GetVideoInfo(path)
 
 	if err != nil {
@@ -42,7 +42,7 @@ func WriteMasterPlaylist(path, playlistPath string, w io.Writer) error {
 		}
 	}
 	fmt.Fprint(w, "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=258157,CODECS=\"avc1.4d400d,mp4a.40.2\",AUDIO=\"stereo\",RESOLUTION=422x180,SUBTITLES=\"subs\"\n")
-	fmt.Fprint(w, playlistPath)
+	fmt.Fprint(w, "index.m3u8")
 
 	return nil
 }
