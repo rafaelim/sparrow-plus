@@ -19,7 +19,7 @@ func (h *Handler) RegisterRoutes(router *http.ServeMux) {
 	router.HandleFunc("GET /api/movies", h.handleGetMovies)
 	router.HandleFunc("GET /api/movies/{movieId}", h.handleGetMovieById)
 
-	router.HandleFunc("POST /api/movies", h.handleCreateMovie)
+	router.HandleFunc("POST /api/movies", h.handleBulkCreateMovies)
 }
 
 func (h *Handler) handleGetMovies(w http.ResponseWriter, r *http.Request) {
@@ -51,18 +51,18 @@ func (h *Handler) handleGetMovieById(w http.ResponseWriter, r *http.Request) {
 	utils.WriteJSON(w, http.StatusOK, movie)
 }
 
-func (h *Handler) handleCreateMovie(w http.ResponseWriter, r *http.Request) {
-	var movie types.CreateMoviePayload
-	if err := utils.ParseJSON(r, &movie); err != nil {
+func (h *Handler) handleBulkCreateMovies(w http.ResponseWriter, r *http.Request) {
+	var movies []types.CreateMoviePayload
+	if err := utils.ParseJSON(r, &movies); err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
 
-	err := h.store.CreateMovie(movie)
+	err := h.store.BulkCreateMovie(movies)
 	if err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusCreated, movie)
+	utils.WriteJSON(w, http.StatusCreated, movies)
 }

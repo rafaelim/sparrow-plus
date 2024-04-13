@@ -2,8 +2,10 @@ package movie
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"sparrow-plus/types"
+	"strings"
 
 	"github.com/google/uuid"
 )
@@ -52,12 +54,42 @@ func (s *Store) GetMovieById(movieId string) (*types.Movie, error) {
 	return movie, nil
 }
 
+func (s *Store) BulkCreateMovie(movies []types.CreateMoviePayload) error {
+	if len(movies) == 0 {
+		log.Println("No movie was inserted, received an empty array.")
+		return nil
+	}
+	var insert = make([]string, 0, len(movies))
+	var rowsArgs = make([]interface{}, 0, len(movies)*4)
+	for _, movie := range movies {
+		insert = append(insert, "(?, ?, ?, ?)")
+		rowsArgs = append(rowsArgs, uuid.New())
+		rowsArgs = append(rowsArgs, movie.Name)
+		rowsArgs = append(rowsArgs, movie.Year)
+		rowsArgs = append(rowsArgs, movie.Path)
+	}
+	query := fmt.Sprintf(`
+		INSERT INTO "movies"
+			(movieId, name, year, path)
+		VALUES
+			%v
+	`, strings.Join(insert, ","))
+	_, inerr := s.db.Exec(query, rowsArgs...)
+
+	if inerr != nil {
+		log.Fatal(inerr)
+	}
+
+	return nil
+}
+
 func (s *Store) CreateMovie(movie types.CreateMoviePayload) error {
 	_, err := s.db.Exec(
-		"INSERT INTO movies (movieId, name, filePath) VALUES (?, ?, ?)",
+		"INSERT INTO movies (movieId, name, year, path) VALUES (?, ?, ?, ?)",
 		uuid.New(),
 		movie.Name,
-		movie.FilePath,
+		movie.Year,
+		movie.Path,
 	)
 	if err != nil {
 		return err
@@ -71,7 +103,8 @@ func scanRowsIntoMovie(rows *sql.Rows) (*types.Movie, error) {
 	err := rows.Scan(
 		&movie.MovieId,
 		&movie.Name,
-		&movie.FilePath,
+		&movie.Year,
+		&movie.Path,
 		&movie.CreatedAt,
 		&movie.UpdatedAt,
 		&movie.DeletedAt,
@@ -89,7 +122,8 @@ func (s *Store) createMoviesTable() {
 		CREATE TABLE IF NOT EXISTS "movies" (
 			movieId    VARCHAR(36) PRIMARY KEY,
 			name       VARCHAR(255) NOT NULL,
-			filePath   VARCHAR(128) NOT NULL,
+			year       VARCHAR(5) NOT NULL,
+			path	   VARCHAR(128) NOT NULL,
 			createdAt  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			updatedAt  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			deletedAt  TIMESTAMP
