@@ -19,5 +19,5 @@ func SetupEnv() {
 
 	hls.FFMpeg = ffmpeg
 	hls.FFProbe = ffprobe
-	hls.RootDir = ""
+	hls.RootDir = "/home/rafael/personal/sparrow-plus/videos"
 }
