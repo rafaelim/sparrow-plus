@@ -1,3 +1,5 @@
+import requests
+import json
 import os
 from guessit import api
 
@@ -18,8 +20,8 @@ def scan(path):
 
         if raw.get("type") == "movie":
             info = {
-                "title": raw["title"],
-                "year":raw.get("year"),
+                "name": raw["title"],
+                "year":str(raw.get("year")),
                 "path": path
             }
         elif raw.get("type") == "episode":
@@ -40,3 +42,5 @@ if __name__ == '__main__':
     to_create = scan("<path>")
 
     print(to_create)
+    response = requests.post("http://localhost:3000/api/movies", data=json.dumps(to_create), headers={'Content-Type': 'application/json'})
+    print(response.json())

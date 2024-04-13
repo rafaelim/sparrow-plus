@@ -1,7 +1,12 @@
 babelfish==0.6.0
+certifi==2024.2.2
+charset-normalizer==3.3.2
 guessit==3.8.0
+idna==3.7
 importlib-resources==6.4.0
 python-dateutil==2.9.0.post0
 rebulk==3.2.0
+requests==2.31.0
 six==1.16.0
+urllib3==2.2.1
 zipp==3.18.1
