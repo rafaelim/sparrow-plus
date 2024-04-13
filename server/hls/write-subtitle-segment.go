@@ -17,7 +17,7 @@ func WriteSubtiteSegment(video string, segment, index int, w io.Writer) error {
 		"-muxdelay", "0",
 		"pipe:",
 	}
-	fmt.Println(args)
+
 	output, err := exec.Command(FFMpeg, args...).Output()
 
 	if err != nil {

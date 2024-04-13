@@ -3,7 +3,7 @@
 	import Video from '@components/video.svelte';
 
 	export let data: { showId: string };
-	const baseUrl = 'http://localhost:3000/api/stream/show';
+	const baseUrl = 'http://192.168.3.16:3000/api/stream/show';
 
 	export let options = {
 		source: `${baseUrl}/${data.showId}/master.m3u8`

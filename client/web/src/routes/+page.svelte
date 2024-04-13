@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Movies from "@components/movies.svelte";
-	import Shows from "@components/shows.svelte";
-
+	import 'video.js/dist/video-js.css';
+	import Movies from '@components/movies.svelte';
+	import Shows from '@components/shows.svelte';
 </script>
 
 <main>

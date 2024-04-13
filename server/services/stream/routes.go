@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"net/url"
 	"sparrow-plus/hls"
 	"sparrow-plus/types"
 	"sparrow-plus/utils"
@@ -28,10 +27,11 @@ func NewHandler(
 
 func (h *Handler) withPath(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		videoType := r.URL.Query().Get("type")
+		videoType := r.URL.Query().Get("watch")
 		id := r.URL.Query().Get("id")
-		values := make(url.Values, 1)
+		values := r.URL.Query()
 
+		fmt.Println(videoType, id)
 		var path string
 		switch videoType {
 		case "movies":
@@ -44,6 +44,7 @@ func (h *Handler) withPath(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		if path == "" {
+			fmt.Println(videoType, id)
 			http.NotFound(w, r)
 			return
 		}
@@ -69,9 +70,11 @@ func (h *Handler) RegisterRoutes(router *http.ServeMux) {
 
 func (h *Handler) handleMasterPlaylist(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Query().Get("path")
-	slog.Info("Init master playlist handler", "video", path)
+	values := r.URL.Query()
+	values.Del("path")
+	slog.Info("Init master playlist handler", "video", path, "values", values)
 	w.Header().Add("Content-type", hls.ContentType)
-	err := hls.WriteMasterPlaylist(path, w)
+	err := hls.WriteMasterPlaylist(path, values, w)
 
 	if err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, err)
@@ -81,9 +84,11 @@ func (h *Handler) handleMasterPlaylist(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) handleAudioPlaylist(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Query().Get("path")
 	audioIndex := r.PathValue("audioIndex")
+	values := r.URL.Query()
+	values.Del("path")
 	slog.Info("Init audio playlist handler", "path", path, "audioIndex", audioIndex)
 
-	template := fmt.Sprintf("%v://%v/api/stream/audio/%v/segment/{{.Segment}}", "http", r.Host, audioIndex)
+	template := fmt.Sprintf("%v://%v/api/stream/audio/%v/segment/{{.Segment}}?%v", "http", r.Host, audioIndex, values.Encode())
 	w.Header().Add("Content-type", hls.ContentType)
 	err := hls.WritePlaylist(template, path, 1080, w)
 
@@ -94,10 +99,12 @@ func (h *Handler) handleAudioPlaylist(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) handleSubtitlesPlaylist(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Query().Get("path")
+	values := r.URL.Query()
+	values.Del("path")
 	subtitleIndex := r.PathValue("subtitleIndex")
 	slog.Info("Init subtitle playlist handler", "path", path, "subtitleIndex", subtitleIndex)
 
-	template := fmt.Sprintf("%v://%v/api/stream/subtitles/%v/segment/{{.Segment}}", "http", r.Host, subtitleIndex)
+	template := fmt.Sprintf("%v://%v/api/stream/subtitles/%v/segment/{{.Segment}}?%v", "http", r.Host, subtitleIndex, values.Encode())
 	w.Header().Add("Content-type", hls.ContentType)
 	err := hls.WriteSinglePlaylist(template, path, 1080, w)
 
@@ -109,8 +116,10 @@ func (h *Handler) handleSubtitlesPlaylist(w http.ResponseWriter, r *http.Request
 func (h *Handler) handlePlaylist(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Query().Get("path")
 	slog.Info("Init playlist handler", "path", path)
+	values := r.URL.Query()
+	values.Del("path")
 
-	template := fmt.Sprintf("%v://%v/api/stream/segments/{{.Resolution}}/{{.Segment}}/", "http", r.Host)
+	template := fmt.Sprintf("%v://%v/api/stream/segments/{{.Resolution}}/{{.Segment}}?%v", "http", r.Host, values.Encode())
 	w.Header().Add("Content-type", hls.ContentType)
 	err := hls.WritePlaylist(template, path, 1080, w)
 

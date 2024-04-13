@@ -1,25 +1,25 @@
 <script lang="ts">
-	import type { CarouselOptions } from "$lib/carousel";
+	import type { CarouselOptions } from '$lib/carousel';
 
-
-	export let options: CarouselOptions = {rows: []}
+	export let rows: Record<string, string>[] = [];
+	export let options: CarouselOptions = {};
 
 	const getNextRoute = (row: Record<string, string>) => {
-		const key = options.idKey ?? ''
-		const rowId = row[key]
+		const key = options.idKey ?? '';
+		const rowId = row[key];
 
-		return `${options.nextRoute}/${rowId}`
-	}
+		return `${options.nextRoute}/${rowId}`;
+	};
 
 	const getTitle = (row: Record<string, string>) => {
-		const key = options.titleKey ?? ''
-		return row[key]
-	}
+		const key = options.titleKey ?? '';
+		return row[key];
+	};
 </script>
 
-<div class="container"  {...options}>
+<div class="container" {...options}>
 	{#if options}
-		{#each options.rows as row}
+		{#each rows as row}
 			<a href={getNextRoute(row)} class="box">
 				<img src="https://assets.nflxext.com/us/boxshots/tv_sdp_s/70143813.jpg" alt="img" />
 				<div class="overlay">

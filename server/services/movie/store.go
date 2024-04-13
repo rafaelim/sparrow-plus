@@ -38,7 +38,8 @@ func (s *Store) GetMovies() ([]*types.Movie, error) {
 }
 
 func (s *Store) GetMovieById(movieId string) (*types.Movie, error) {
-	rows, err := s.db.Query(`SELECT * FROM "movies" WHERE "deletedAt" IS NULL AND "movieId" = ?`, movieId)
+	fmt.Println(movieId)
+	rows, err := s.db.Query(`SELECT * FROM "movies" WHERE "movieId" = ?`, movieId)
 	if err != nil {
 		return nil, err
 	}

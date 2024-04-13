@@ -5,10 +5,9 @@
 	import type { CarouselOptions } from '$lib/carousel';
 
 	onMount(async () => {
-		fetch('http://localhost:3000/api/movies')
+		fetch('http://192.168.3.16:3000/api/movies')
 			.then((response) => response.json())
 			.then((data) => {
-				console.log(data);
 				apiData.set(data);
 			})
 			.catch((error) => {
@@ -18,7 +17,6 @@
 	});
 
 	export const options: CarouselOptions = {
-		rows: $movies,
 		idKey: 'movieId',
 		nextRoute: '/watch/movie',
 		titleKey: 'name'
@@ -28,6 +26,6 @@
 {#if $movies.length}
 	<h1>Movies</h1>
 	<div style="display: flex; flex-direction: column">
-		<Carousel {options} />
+		<Carousel {options} rows={$movies} />
 	</div>
 {/if}

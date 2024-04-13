@@ -80,7 +80,7 @@ func GetStreams(info map[string]interface{}) []StreamInfo {
 
 		languageName, ok := streamInfo["tags"].(map[string]interface{})["title"].(string)
 		if !ok {
-			languageName = "Unknown"
+			languageName = language
 		}
 		streamsInfo = append(streamsInfo, StreamInfo{
 			Index:        streamInfo["index"].(float64),

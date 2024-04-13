@@ -3,9 +3,10 @@ package hls
 import (
 	"fmt"
 	"io"
+	"net/url"
 )
 
-func WriteMasterPlaylist(path string, w io.Writer) error {
+func WriteMasterPlaylist(path string, values url.Values, w io.Writer) error {
 	videoInfo, err := GetVideoInfo(path)
 
 	if err != nil {
@@ -26,7 +27,7 @@ func WriteMasterPlaylist(path string, w io.Writer) error {
 				stream.Language,
 				stream.LanguageName,
 				defaultLang,
-				fmt.Sprintf("audio/%v/index.m3u8", stream.Index),
+				fmt.Sprintf("audio/%v/index.m3u8?%v", stream.Index, values.Encode()),
 			)
 		}
 		if stream.Codec_type == "subtitle" {
@@ -37,12 +38,12 @@ func WriteMasterPlaylist(path string, w io.Writer) error {
 				stream.Language,
 				stream.LanguageName,
 				defaultLang,
-				fmt.Sprintf("subtitles/%v/index.m3u8", stream.Index),
+				fmt.Sprintf("subtitles/%v/index.m3u8?%v", stream.Index, values.Encode()),
 			)
 		}
 	}
 	fmt.Fprint(w, "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=258157,CODECS=\"avc1.4d400d,mp4a.40.2\",AUDIO=\"stereo\",RESOLUTION=422x180,SUBTITLES=\"subs\"\n")
-	fmt.Fprint(w, "index.m3u8")
+	fmt.Fprintf(w, "index.m3u8?%v", values.Encode())
 
 	return nil
 }
