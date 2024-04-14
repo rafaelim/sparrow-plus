@@ -52,19 +52,38 @@ func (s *Store) GetShowById(showId string) (*types.Show, error) {
 	return show, nil
 }
 
-func (s *Store) CreateShow(show types.CreateShowPayload) error {
-	_, err := s.db.Exec(
-		"INSERT INTO shows (showId, name seasons, filePath) VALUES (?, ?, ?, ?)",
-		uuid.New(),
-		show.Name,
-		show.Seasons,
-		show.FilePath,
-	)
+func (s *Store) GetShowByName(name string) (*types.Show, error) {
+	rows, err := s.db.Query(`SELECT * FROM "shows" WHERE "name" = ?`, name)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	show := new(types.Show)
+	for rows.Next() {
+		show, err = scanRowsIntoShow(rows)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return show, nil
+}
+
+func (s *Store) CreateShow(payload types.CreateShowPayload) (*types.Show, error) {
+	show := &types.Show{
+		ShowId: uuid.New().String(),
+		Name:   payload.Name,
+	}
+	_, err := s.db.Exec(
+		"INSERT INTO shows (showId, name) VALUES (?, ?)",
+		show.ShowId,
+		show.Name,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return show, nil
 }
 
 func scanRowsIntoShow(rows *sql.Rows) (*types.Show, error) {
@@ -72,8 +91,6 @@ func scanRowsIntoShow(rows *sql.Rows) (*types.Show, error) {
 	err := rows.Scan(
 		&show.ShowId,
 		&show.Name,
-		&show.Seasons,
-		&show.FilePath,
 		&show.CreatedAt,
 		&show.UpdatedAt,
 		&show.DeletedAt,
@@ -91,8 +108,6 @@ func (s *Store) createShowsTable() {
 		CREATE TABLE IF NOT EXISTS "shows" (
 			showId     VARCHAR(36) PRIMARY KEY,
 			name       VARCHAR(255) NOT NULL,
-			seasons    INT NOT NULL,
-			filePath   VARCHAR(128) NOT NULL,
 			createdAt  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			updatedAt  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			deletedAt  TIMESTAMP

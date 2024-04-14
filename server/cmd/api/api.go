@@ -32,10 +32,14 @@ func (s *APIServe) Run() error {
 	movieHandler := movie.NewHandler(movieStore)
 	movieHandler.RegisterRoutes(router)
 
-	showStore := show.NewStore(s.db)
 	episodeStore := episode.NewStore(s.db)
+	showStore := show.NewStore(s.db)
+
 	showHandler := show.NewHandler(showStore, episodeStore)
 	showHandler.RegisterRoutes(router)
+
+	episodeHandler := episode.NewHandler(episodeStore, showStore)
+	episodeHandler.RegisterRoutes(router)
 
 	streamHandler := stream.NewHandler(movieStore, episodeStore)
 	streamHandler.RegisterRoutes(router)

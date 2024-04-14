@@ -1,11 +1,12 @@
 <script lang="ts">
-	import Carousel from './carousel.svelte';
-	import { apiData, shows } from '$lib/showsStore';
 	import { onMount } from 'svelte';
 	import type { CarouselOptions } from '$lib/carousel';
+	import Carousel from '@components/carousel.svelte';
+	import { apiData, episodes } from '$lib/episodeStore';
 
+	export let data: { showId: string };
 	onMount(async () => {
-		fetch('http://192.168.3.16:3000/api/shows')
+		fetch(`http://192.168.3.16:3000/api/episodes/show/${data.showId}`)
 			.then((response) => response.json())
 			.then((data) => {
 				console.log(data);
@@ -18,15 +19,15 @@
 	});
 
 	export const options: CarouselOptions = {
-		idKey: 'showId',
-		nextRoute: '/shows',
+		idKey: 'episodeId',
+		nextRoute: '/watch/episode',
 		titleKey: 'name'
 	};
 </script>
 
-{#if $shows.length}
-	<h1>Shows</h1>
+{#if $episodes.length}
+	<h1>Episodes</h1>
 	<div style="display: flex; flex-direction: column">
-		<Carousel {options} rows={$shows} />
+		<Carousel {options} rows={$episodes} />
 	</div>
 {/if}

@@ -16,18 +16,15 @@ func NewStore(db *sql.DB) *Store {
 	return &Store{db: db}
 }
 
-func (s *Store) GetEpisodes(showId string, season int) ([]*types.Episode, error) {
+func (s *Store) GetEpisodes(showId string) ([]*types.Episode, error) {
 	rows, err := s.db.Query(`
 		SELECT 
 			*
 		FROM "episodes" 
 		WHERE 
-			"deletedAt" IS NULL AND
-			"showId" = ? AND
-			"season" = ?
+			"showId" = ?
 		`,
 		showId,
-		season,
 	)
 
 	if err != nil {
@@ -65,11 +62,12 @@ func (s *Store) GetEpisodeById(episodeId string) (*types.Episode, error) {
 
 func (s *Store) CreateEpisode(episode types.CreateEpisodePayload) error {
 	_, err := s.db.Exec(
-		"INSERT INTO episodes (episodeId, name seasons, showId, path) VALUES (?, ?, ?, ?, ?)",
+		"INSERT INTO episodes (episodeId, showId, name, season, episodeNumber, path) VALUES (?, ?, ?, ?, ?, ?)",
 		uuid.New(),
-		episode.Name,
-		episode.Seasons,
 		episode.ShowId,
+		episode.Name,
+		episode.Season,
+		episode.EpisodeNumber,
 		episode.Path,
 	)
 	if err != nil {
@@ -83,9 +81,10 @@ func scanRowsIntoEpisode(rows *sql.Rows) (*types.Episode, error) {
 	episode := new(types.Episode)
 	err := rows.Scan(
 		&episode.EpisodeId,
-		&episode.Name,
-		&episode.Seasons,
 		&episode.ShowId,
+		&episode.Name,
+		&episode.Season,
+		&episode.EpisodeNumber,
 		&episode.Path,
 		&episode.CreatedAt,
 		&episode.UpdatedAt,
@@ -102,14 +101,15 @@ func scanRowsIntoEpisode(rows *sql.Rows) (*types.Episode, error) {
 func (s *Store) createEpisodesTable() {
 	_, err := s.db.Exec(`
 		CREATE TABLE IF NOT EXISTS "episodes" (
-			episodeId  VARCHAR(36) PRIMARY KEY,
-			name       VARCHAR(255) NOT NULL,
-			season     INT NOT NULL,
-			showId 	   VARCHAR(36) NOT NULL,
-			path   VARCHAR(128) NOT NULL,
-			createdAt  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-			updatedAt  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-			deletedAt  TIMESTAMP,
+			episodeId     VARCHAR(36) PRIMARY KEY,
+			showId 	      VARCHAR(36) NOT NULL,
+			name          VARCHAR(255) NOT NULL,
+			season        VARCHAR(36) NOT NULL,
+			episodeNumber VARCHAR(36) NOT NULL,
+			path          VARCHAR(128) NOT NULL,
+			createdAt     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			updatedAt     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			deletedAt     TIMESTAMP,
 			FOREIGN KEY(showId) REFERENCES shows(showId)
 		)
 	`)
