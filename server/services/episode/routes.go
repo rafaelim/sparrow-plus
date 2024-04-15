@@ -19,7 +19,6 @@ func NewHandler(store types.EpisodeStore, showStore types.ShowStore) *Handler {
 func (h *Handler) RegisterRoutes(router *http.ServeMux) {
 	router.HandleFunc("POST /api/episodes", h.handleCreateShow)
 
-	router.HandleFunc("GET /api/episodes/show/{showId}", h.handleGetEpisodes)
 	router.HandleFunc("GET /api/episodes/{episodeId}", h.handleGetEpisodeById)
 }
 
@@ -45,9 +44,7 @@ func (h *Handler) handleCreateShow(w http.ResponseWriter, r *http.Request) {
 		}
 
 	}
-	fmt.Println(show)
 	episode.ShowId = show.ShowId
-	fmt.Printf("%+v\n", episode)
 	err := h.store.CreateEpisode(episode)
 	if err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, err)
@@ -55,19 +52,6 @@ func (h *Handler) handleCreateShow(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.WriteJSON(w, http.StatusCreated, episode)
-}
-
-func (h *Handler) handleGetEpisodes(w http.ResponseWriter, r *http.Request) {
-	showId := r.PathValue("showId")
-
-	episodes, err := h.store.GetEpisodes(showId)
-	if err != nil {
-		utils.WriteError(w, http.StatusInternalServerError, err)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	utils.WriteJSON(w, http.StatusOK, episodes)
 }
 
 func (h *Handler) handleGetEpisodeById(w http.ResponseWriter, r *http.Request) {

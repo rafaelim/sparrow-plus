@@ -8,6 +8,7 @@ import (
 	"sparrow-plus/services/movie"
 	"sparrow-plus/services/show"
 	"sparrow-plus/services/stream"
+	watchstatus "sparrow-plus/services/watch-status"
 
 	"github.com/rs/cors"
 )
@@ -40,6 +41,10 @@ func (s *APIServe) Run() error {
 
 	episodeHandler := episode.NewHandler(episodeStore, showStore)
 	episodeHandler.RegisterRoutes(router)
+
+	watchStatusStore := watchstatus.NewStore(s.db)
+	watchStatusHandler := watchstatus.NewHandler(watchStatusStore)
+	watchStatusHandler.RegisterRoutes(router)
 
 	streamHandler := stream.NewHandler(movieStore, episodeStore)
 	streamHandler.RegisterRoutes(router)

@@ -5,10 +5,17 @@
 	export let options: CarouselOptions = {};
 
 	const getNextRoute = (row: Record<string, string>) => {
+		const nextRoute =
+			typeof options.nextRoute === 'function' ? options.nextRoute(row) : options.nextRoute;
 		const key = options.idKey ?? '';
 		const rowId = row[key];
 
-		return `${options.nextRoute}/${rowId}`;
+		let params = '';
+		if (options.getParams) {
+			params = options.getParams(row);
+		}
+
+		return `${nextRoute}/${rowId}?${params}`;
 	};
 
 	const getTitle = (row: Record<string, string>) => {

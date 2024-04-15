@@ -10,6 +10,7 @@ def scan(path):
 
     to_create = []
     for path in videos:
+        print('reading...', path)
         raw = api.guessit(path, 
 		{
 			"single_value": True
@@ -26,12 +27,10 @@ def scan(path):
             }
         elif raw.get("type") == "episode":
             info = {
-                "title": raw["title"],
-                "season":raw.get("season"),
-                "episode_nbr":raw.get("episode") if raw.get("episode") is not None  else raw.get("episode_title"),
-                "episode_title":raw.get("episode_title"),
-                "absolute":raw.get("episode") if "season" not in raw else None,
-                "year":raw.get("year"),
+                "showName": raw["title"],
+                "season":str(raw.get("season")),
+                "episodeNumber":str(raw.get("episode")) if raw.get("episode") is not None  else raw.get("episode_title"),
+                "name":raw.get("episode_title"),
                 "path": path
             }
         to_create.append(info)
@@ -39,8 +38,10 @@ def scan(path):
     return to_create
         
 if __name__ == '__main__':
-    to_create = scan("<path>")
+    print('starting...')
+    to_create = scan("/media/rafael/Expansion/Series/The IT Crowd")
 
-    print(to_create)
-    response = requests.post("http://localhost:3000/api/movies", data=json.dumps(to_create), headers={'Content-Type': 'application/json'})
-    print(response.json())
+    for x in to_create:
+        print(x)
+        response = requests.post("http://localhost:3000/api/episodes", data=json.dumps(x), headers={'Content-Type': 'application/json'})
+        print(response.text)

@@ -6,7 +6,7 @@
 
 	export let data: { showId: string };
 	onMount(async () => {
-		fetch(`http://192.168.3.16:3000/api/episodes/show/${data.showId}`)
+		fetch(`http://192.168.3.16:3000/api/shows/${data.showId}/episodes`)
 			.then((response) => response.json())
 			.then((data) => {
 				console.log(data);
