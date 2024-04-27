@@ -1,11 +1,6 @@
 <script lang="ts">
 	import type { CarouselOptions } from '$lib/carousel';
-	import {
-		createVirtualizer,
-		elementScroll,
-		type VirtualizerOptions
-	} from '@tanstack/svelte-virtual';
-	import { onMount } from 'svelte';
+	import { createVirtualizer } from '@tanstack/svelte-virtual';
 
 	export let rows: Record<string, string>[] = [];
 	export let options: CarouselOptions = {};
@@ -75,8 +70,8 @@
 <style lang="scss">
 	.scroll-container {
 		height: 300px;
-		width: 100vw;
-		overflow: scroll;
+		overflow-y: hidden;
+		overflow-x: scroll;
 		transition: 500ms;
 		scroll-behavior: smooth;
 

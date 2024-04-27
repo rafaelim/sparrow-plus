@@ -26,8 +26,14 @@
 </script>
 
 {#if $episodes.length}
-	<h1>Episodes</h1>
-	<div style="display: flex; flex-direction: column">
+	<section class="section" data-row-index={0}>
+		<h1>Episodes</h1>
 		<Carousel {options} rows={$episodes} />
-	</div>
+	</section>
 {/if}
+
+<style lang="scss">
+	.section {
+		margin: 10px;
+	}
+</style>

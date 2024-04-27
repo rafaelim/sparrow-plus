@@ -16,7 +16,7 @@
 		const player = videoJS(scrollbox, {
 			controls: true,
 			autoplay: true,
-			aspectRatio: '16:9',
+			fill: true,
 			html5: {
 				nativeTextTracks: false,
 				nativeAudioTracks: false,
@@ -53,9 +53,19 @@
 
 	onDestroy(() => {
 		clearInterval(intervalId);
+		if (scrollbox) videoJS(scrollbox).dispose();
 	});
 </script>
 
-<!-- svelte-ignore a11y-media-has-caption -->
-<video bind:this={scrollbox} controls={true} class="vjs-matrix video-js" />
-<div id="audioTrackControl"></div>
+<div class="player">
+	<!-- svelte-ignore a11y-media-has-caption -->
+	<video bind:this={scrollbox} controls={true} class="vjs-matrix video-js" />
+	<div id="audioTrackControl"></div>
+</div>
+
+<style lang="scss">
+	.player {
+		width: 100vw;
+		height: 100vh;
+	}
+</style>

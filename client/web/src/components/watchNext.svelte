@@ -4,6 +4,8 @@
 	import { onMount } from 'svelte';
 	import type { CarouselOptions } from '$lib/carousel';
 
+	export let rowIndex = 0;
+
 	onMount(async () => {
 		fetch('http://192.168.3.16:3000/api/watchStatus')
 			.then((response) => response.json())
@@ -36,8 +38,16 @@
 </script>
 
 {#if $watchNext.length}
-	<h1>Watch Next</h1>
-	<div style="display: flex; flex-direction: column">
-		<Carousel {options} rows={$watchNext} />
-	</div>
+	<section class="section" data-row-index={rowIndex}>
+		<h1>Watch Next</h1>
+		<div style="display: flex; flex-direction: column">
+			<Carousel {options} rows={$watchNext} />
+		</div>
+	</section>
 {/if}
+
+<style lang="scss">
+	.section {
+		margin: 10px;
+	}
+</style>

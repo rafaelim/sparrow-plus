@@ -6,9 +6,9 @@
 </script>
 
 <main class="main">
-	<Movies rowIndex={0} />
+	<WatchNext rowIndex={0} />
 	<Shows rowIndex={1} />
-	<WatchNext />
+	<Movies rowIndex={2} />
 </main>
 
 <style lang="scss">
