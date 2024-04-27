@@ -8,6 +8,19 @@
 	export let options = {
 		source: `${baseUrl}/master.m3u8?watch=movies&id=${data.movieId}`
 	};
+
+	const updateWatchStatus = (options: { timestamp: number }) => {
+		const watchStatus = {
+			timestamp: options.timestamp,
+			relationId: data.movieId,
+			relationType: 'MOVIE'
+		};
+		fetch(`${baseUrl}/watchStatus`, {
+			method: 'POST',
+			headers: [['Content-Type', 'application/json']],
+			body: JSON.stringify(watchStatus)
+		});
+	};
 </script>
 
-<Video {options} />
+<Video {options} {updateWatchStatus} />

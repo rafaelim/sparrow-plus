@@ -17,6 +17,8 @@
 			});
 	});
 
+	export let rowIndex = 0;
+
 	export const options: CarouselOptions = {
 		idKey: 'showId',
 		nextRoute: '/shows',
@@ -25,8 +27,14 @@
 </script>
 
 {#if $shows.length}
-	<h1>Shows</h1>
-	<div style="display: flex; flex-direction: column">
+	<section class="section" data-row-index={rowIndex}>
+		<h1>TV Shows</h1>
 		<Carousel {options} rows={$shows} />
-	</div>
+	</section>
 {/if}
+
+<style lang="scss">
+	.section {
+		margin: 10px;
+	}
+</style>

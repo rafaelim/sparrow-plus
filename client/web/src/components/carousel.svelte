@@ -1,9 +1,23 @@
 <script lang="ts">
 	import type { CarouselOptions } from '$lib/carousel';
+	import {
+		createVirtualizer,
+		elementScroll,
+		type VirtualizerOptions
+	} from '@tanstack/svelte-virtual';
+	import { onMount } from 'svelte';
 
 	export let rows: Record<string, string>[] = [];
 	export let options: CarouselOptions = {};
+	let virtualListEl: HTMLDivElement;
+	let virtualItemEls: HTMLDivElement[] = [];
 
+	$: virtualizer = createVirtualizer<HTMLDivElement, HTMLDivElement>({
+		horizontal: true,
+		count: rows.length,
+		getScrollElement: () => virtualListEl,
+		estimateSize: () => 10
+	});
 	const getNextRoute = (row: Record<string, string>) => {
 		const nextRoute =
 			typeof options.nextRoute === 'function' ? options.nextRoute(row) : options.nextRoute;
@@ -22,48 +36,85 @@
 		const key = options.titleKey ?? '';
 		return row[key];
 	};
+	let start;
+	let end;
+	$: {
+		if (virtualItemEls.length) virtualItemEls.forEach((el) => $virtualizer.measureElement(el));
+	}
 </script>
 
-<div class="container" {...options}>
+<div class="scroll-container" {...options} bind:this={virtualListEl}>
 	{#if options}
-		{#each rows as row}
-			<a href={getNextRoute(row)} class="box">
-				<img src="https://assets.nflxext.com/us/boxshots/tv_sdp_s/70143813.jpg" alt="img" />
-				<div class="overlay">
-					<h3 class="title">{getTitle(row)}</h3>
+		<div
+			class="container"
+			style="position: relative; height: 100%; width: {$virtualizer.getTotalSize()}px;"
+		>
+			{#each $virtualizer.getVirtualItems() as col, idx (col.index)}
+				<div
+					bind:this={virtualItemEls[idx]}
+					data-index={col.index}
+					class="card"
+					style="position: absolute; left: 0; transform: translateX({col.start}px);"
+				>
+					<a
+						href={getNextRoute(rows[col.index])}
+						class="box"
+						style="width: {rows[col.index].length}px"
+					>
+						<img src="/images/placeholder.png" alt="img" />
+						<div class="overlay">
+							<h3 class="title">{getTitle(rows[col.index])}</h3>
+						</div>
+					</a>
 				</div>
-			</a>
-		{/each}
+			{/each}
+		</div>
 	{/if}
 </div>
 
 <style lang="scss">
-	.container {
-		display: flex;
-		align-items: center;
-		overflow-y: hidden;
-		overflow-x: scroll;
-		min-height: 215px;
+	.scroll-container {
+		height: 300px;
+		width: 100vw;
+		overflow: scroll;
 		transition: 500ms;
 		scroll-behavior: smooth;
+
+		scrollbar-width: none;
+		&::-webkit-scrollbar {
+			display: none;
+		}
 	}
+
+	.card {
+		height: 100%;
+		&:first-child {
+			.box {
+				margin-left: 0;
+			}
+		}
+		&:last-child {
+			.box {
+				margin-right: 0;
+			}
+		}
+	}
+
 	.box {
-		min-width: 250px;
-		height: 129px;
 		position: relative;
 		cursor: pointer;
-		transition: transform 0.5s ease;
+
+		display: block;
+		width: 250px;
+		height: 300px;
+		margin: 8px;
+		cursor: pointer;
 	}
 
 	.box img {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-	}
-
-	.box:hover {
-		transform: scale(1.5);
-		z-index: 2;
 	}
 
 	.overlay {
@@ -73,7 +124,7 @@
 		right: 0;
 		bottom: 0;
 		background: rgba(0, 0, 0, 0.7);
-		padding: 5px 10px;
+		padding: 20px;
 		transition: all 0.5s ease;
 		opacity: 0;
 		pointer-events: none;
@@ -86,7 +137,9 @@
 
 	.overlay .title {
 		color: #e9e9e9;
-		font-size: 12px;
+		font-size: 16px;
+		text-transform: capitalize;
+		font-family: sans-serif;
 		cursor: pointer;
 	}
 
