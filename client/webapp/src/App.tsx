@@ -1,8 +1,10 @@
 import { RouterProvider, createHashRouter } from "react-router-dom";
-import Home from "./pages/home";
+import Home from "./pages/Home";
 import { lazy } from "react";
 
-const Episodes = lazy(() => import("./pages/episodes"));
+const Episodes = lazy(() => import("./pages/Episodes"));
+const EpisodePlayer = lazy(() => import("./pages/EpisodePlayer"));
+const MoviePlayer = lazy(() => import("./pages/MoviePlayer"));
 
 const router = createHashRouter(
   [
@@ -13,6 +15,14 @@ const router = createHashRouter(
     {
       path: "/shows/:showId/episodes",
       element: <Episodes />,
+    },
+    {
+      path: "/watch/episode/:episodeId",
+      element: <EpisodePlayer />,
+    },
+    {
+      path: "/watch/movie/:movieId",
+      element: <MoviePlayer />,
     },
   ],
   { basename: "/" }

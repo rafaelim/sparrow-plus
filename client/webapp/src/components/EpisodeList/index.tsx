@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useFetch from "../../hooks/useFetch";
 import Carousel from "../Carousel";
 
@@ -12,6 +12,7 @@ type Episode = {
 
 const EpisodeList: React.FC = () => {
   const { showId } = useParams<{ showId: string }>();
+  const navigate = useNavigate();
   const { data, error } = useFetch<Episode[]>(
     `http://192.168.3.16:3000/api/shows/${showId}/episodes`
   );
@@ -26,7 +27,7 @@ const EpisodeList: React.FC = () => {
       label="Episodes"
       items={data ?? []}
       renderName={getName}
-      onItemClick={() => console.log("dasdsadas")}
+      onItemClick={(row) => navigate(`/watch/episode/${row.episodeId}`)}
     />
   );
 };
