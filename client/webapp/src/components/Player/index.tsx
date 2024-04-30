@@ -2,10 +2,15 @@ import { useCallback, useEffect, useRef } from "react";
 import videoJS from "video.js";
 import type Player from "video.js/dist/types/player";
 import styled from "styled-components";
+import { useSearchParams } from "react-router-dom";
 
 const Container = styled.div`
-  width: 100vw;
   height: 100vh;
+
+  > div:first-of-type {
+    height: 100% !important;
+    padding-top: 0 !important;
+  }
 `;
 
 type PlayerComponentProps = {
@@ -17,6 +22,7 @@ const PlayerComponent: React.FC<PlayerComponentProps> = ({
   onTimestampUpdates,
   source,
 }) => {
+  const [searchParams] = useSearchParams();
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<Player>();
 
@@ -25,7 +31,7 @@ const PlayerComponent: React.FC<PlayerComponentProps> = ({
     playerRef.current = videoJS(videoRef?.current as Element, {
       controls: true,
       autoplay: true,
-      fill: true,
+      fill: false,
       html5: {
         nativeTextTracks: false,
         nativeAudioTracks: false,
@@ -54,12 +60,9 @@ const PlayerComponent: React.FC<PlayerComponentProps> = ({
     if (!playerRef?.current) return;
 
     let intervalId: number;
-    const urlParams = new URLSearchParams(window.location.search);
 
-    const timestamp = urlParams.get("timestamp");
-    if (timestamp) {
-      playerRef.current?.currentTime(timestamp ?? 0);
-    }
+    const timestamp = searchParams.get("timestamp");
+    if (timestamp) playerRef.current?.currentTime(timestamp);
     playerRef.current.on("play", () => {
       intervalId = setInterval(() => {
         update(playerRef.current as Player);
@@ -69,7 +72,7 @@ const PlayerComponent: React.FC<PlayerComponentProps> = ({
       clearInterval(intervalId);
       update(playerRef.current as Player);
     });
-  }, [playerRef, update]);
+  }, [playerRef, searchParams, update]);
 
   return (
     <Container>
