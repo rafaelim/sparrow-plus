@@ -35,7 +35,7 @@ export const Card = styled.div`
   }
 `;
 
-export const Item = styled.div`
+export const Item = styled.div<{ active: boolean }>`
   position: relative;
   cursor: pointer;
 
@@ -80,6 +80,17 @@ export const Item = styled.div`
   > .overlay .title:hover {
     color: #fff;
   }
+
+  ${({ active }) =>
+    active &&
+    `> .overlay {
+    opacity: 1;
+
+    pointer-events: all;}
+  > .overlay .title {
+    color: #fff;
+  }
+  `}
 `;
 
 export const ItemTitle = styled.h2`
