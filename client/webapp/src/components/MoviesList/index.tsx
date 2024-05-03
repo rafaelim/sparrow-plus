@@ -1,5 +1,6 @@
-import { useEffect } from "react";
+import { useContext } from "react";
 import useFetch from "../../hooks/useFetch";
+import { NavigationContext } from "../../navigation/SamsungNavigation";
 import Carousel from "../Carousel";
 
 type Movies = {
@@ -9,31 +10,27 @@ type Movies = {
   path: string;
 };
 
-type MoviesListProps = {
-  onLoad: () => void;
-  active: boolean;
-};
-
-const MoviesList: React.FC<MoviesListProps> = ({ onLoad, active }) => {
+function MoviesList() {
+  const { position, positionHandler } = useContext(NavigationContext);
   const { data, error } = useFetch<Movies[]>(
     "http://192.168.3.16:3000/api/movies"
   );
 
-  useEffect(() => {
-    if (error || !data?.length) return;
-    onLoad();
-  }, [error, data, onLoad]);
-
   if (error || !data?.length) return <></>;
+
+  const rowPosition = positionHandler.getNextY("movies");
+
   return (
     <Carousel
       label="Movies"
       items={data ?? []}
-      active={active}
+      isPositionActive={(colIdx) =>
+        colIdx === position.x && position.y === rowPosition
+      }
       renderName={(item: Movies) => item.name}
       onItemClick={() => console.log("dasdsadas")}
     />
   );
-};
+}
 
 export default MoviesList;

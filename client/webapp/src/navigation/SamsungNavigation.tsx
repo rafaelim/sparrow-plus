@@ -1,4 +1,6 @@
-import { useEffect } from "react";
+import { createContext, useEffect, useState } from "react";
+import PositionHandler from "./PositionHandler";
+import { useNavigate } from "react-router-dom";
 
 const keyCodes = {
   LEFT: 37,
@@ -9,27 +11,47 @@ const keyCodes = {
   BACK: 10009,
 } as const;
 
-const SamsungNavigation = () => {
+type NavigationContextValues = {
+  position: { x: number; y: number };
+  positionHandler: typeof PositionHandler;
+};
+
+export const NavigationContext = createContext<NavigationContextValues>({
+  position: { x: 0, y: 0 },
+  positionHandler: PositionHandler,
+});
+
+type SamsungNavigationProps = {
+  children: React.ReactNode;
+};
+
+function SamsungNavigation({ children }: SamsungNavigationProps) {
+  const navigate = useNavigate();
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+
   useEffect(() => {
     const listener = (evt: KeyboardEvent) => {
       switch (evt.keyCode) {
         case keyCodes.LEFT:
-          alert(keyCodes.LEFT);
+          setPosition((pos) => ({ x: Math.min(0, position.x - 1), y: pos.y }));
           break;
         case keyCodes.RIGHT:
-          alert(keyCodes.RIGHT);
+          setPosition((pos) => ({ x: pos.x + 1, y: pos.y }));
           break;
         case keyCodes.UP:
-          alert(keyCodes.UP);
+          setPosition((pos) => ({ x: pos.x, y: Math.min(0, pos.y - 1) }));
           break;
         case keyCodes.DOWN:
-          alert(keyCodes.DOWN);
+          setPosition((pos) => ({
+            x: pos.x,
+            y: Math.min(PositionHandler.getLastY(), pos.y + 1),
+          }));
           break;
         case keyCodes.OK:
-          alert(keyCodes.OK);
+          PositionHandler.triggerOpenEvent();
           break;
         case keyCodes.BACK:
-          alert(keyCodes.BACK);
+          navigate(-1);
           break;
 
         default:
@@ -43,7 +65,13 @@ const SamsungNavigation = () => {
     };
   });
 
-  return <></>;
-};
+  return (
+    <NavigationContext.Provider
+      value={{ position, positionHandler: PositionHandler }}
+    >
+      {children}
+    </NavigationContext.Provider>
+  );
+}
 
 export default SamsungNavigation;

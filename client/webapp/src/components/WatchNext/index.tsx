@@ -1,7 +1,8 @@
 import { createSearchParams, useNavigate } from "react-router-dom";
 import useFetch from "../../hooks/useFetch";
 import Carousel from "../Carousel";
-import { useEffect } from "react";
+import { NavigationContext } from "../../navigation/SamsungNavigation";
+import { useContext } from "react";
 
 type WatchStatus = {
   watchStatusId: string;
@@ -10,23 +11,15 @@ type WatchStatus = {
   timestamp: string;
 };
 
-type WatchNextProps = {
-  onLoad: () => void;
-  active: boolean;
-};
-
-const WatchNext: React.FC<WatchNextProps> = ({ onLoad, active }) => {
+function WatchNext() {
   const navigate = useNavigate();
+  const { position, positionHandler } = useContext(NavigationContext);
   const { data, error } = useFetch<WatchStatus[]>(
     "http://192.168.3.16:3000/api/watchStatus"
   );
 
-  useEffect(() => {
-    if (error || !data?.length) return;
-    onLoad();
-  }, [error, data, onLoad]);
-
   if (error || !data?.length) return <></>;
+  const rowPosition = positionHandler.getNextY("watch-next");
 
   const handleOnClick = (row: WatchStatus) => {
     if (row.relationType === "EPISODE") {
@@ -49,11 +42,13 @@ const WatchNext: React.FC<WatchNextProps> = ({ onLoad, active }) => {
     <Carousel
       label="Watch Next"
       items={data ?? []}
-      active={active}
+      isPositionActive={(colIdx) =>
+        colIdx === position.x && position.y === rowPosition
+      }
       renderName={(item: WatchStatus) => item.watchStatusId}
       onItemClick={handleOnClick}
     />
   );
-};
+}
 
 export default WatchNext;

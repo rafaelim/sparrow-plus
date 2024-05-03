@@ -8,9 +8,10 @@ import SamsungNavigation from "./navigation/SamsungNavigation.tsx";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Suspense fallback={<div>loading...</div>}>
-      <SamsungNavigation />
-      <GlobalStyle />
-      <App />
+      <SamsungNavigation>
+        <GlobalStyle />
+        <App />
+      </SamsungNavigation>
     </Suspense>
   </React.StrictMode>
 );

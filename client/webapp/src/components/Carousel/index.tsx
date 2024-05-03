@@ -1,6 +1,6 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
 import placeholder from "../../assets/png/placeholder.png";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import {
   Card,
   Container,
@@ -15,7 +15,7 @@ type CarouselProps<T> = {
   items: T[];
   renderName: (item: T) => string;
   onItemClick: (item: T) => void;
-  active: boolean;
+  isPositionActive: (colIdx: number) => boolean;
 };
 
 const Carousel = <T extends Record<string, unknown>>({
@@ -23,9 +23,8 @@ const Carousel = <T extends Record<string, unknown>>({
   items,
   renderName,
   onItemClick,
-  active,
+  isPositionActive,
 }: CarouselProps<T>) => {
-  const [col, setCol] = useState(0);
   const parentRef = useRef<HTMLDivElement | null>(null);
 
   const virtualizer = useVirtualizer({
@@ -36,7 +35,7 @@ const Carousel = <T extends Record<string, unknown>>({
   });
 
   return (
-    <Container data-row-active={active}>
+    <Container>
       <Title>{label}</Title>
       <ListContainer ref={parentRef} style={{ height: 320, overflowY: "auto" }}>
         <div
@@ -61,7 +60,7 @@ const Carousel = <T extends Record<string, unknown>>({
             >
               <Item
                 onClick={() => onItemClick(items[virtualColumn.index])}
-                active={active && col === virtualColumn.index}
+                active={isPositionActive(virtualColumn.index)}
               >
                 <img src={placeholder} alt="img" />
                 <div className="overlay">
