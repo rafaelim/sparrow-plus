@@ -33,4 +33,4 @@ class PositionHandler {
   }
 }
 
-export default new PositionHandler();
+export default PositionHandler;

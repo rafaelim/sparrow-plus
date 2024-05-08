@@ -1,7 +1,9 @@
 import { useNavigate, useParams } from "react-router-dom";
 import useFetch from "../../hooks/useFetch";
 import Carousel from "../Carousel";
-import { NavigationContext } from "../../navigation/SamsungNavigation";
+import SamsungNavigation, {
+  NavigationContext,
+} from "../../navigation/SamsungNavigation";
 import { useContext } from "react";
 
 type Episode = {
@@ -12,7 +14,7 @@ type Episode = {
   path: string;
 };
 
-const EpisodeList: React.FC = () => {
+function Episodes() {
   const { position, positionHandler } = useContext(NavigationContext);
   const { showId } = useParams<{ showId: string }>();
   const navigate = useNavigate();
@@ -37,6 +39,14 @@ const EpisodeList: React.FC = () => {
       onItemClick={(row) => navigate(`/watch/episode/${row.episodeId}`)}
     />
   );
-};
+}
+
+function EpisodeList() {
+  return (
+    <SamsungNavigation>
+      <Episodes />
+    </SamsungNavigation>
+  );
+}
 
 export default EpisodeList;

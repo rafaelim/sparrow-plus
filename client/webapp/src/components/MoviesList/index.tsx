@@ -2,6 +2,7 @@ import { useContext } from "react";
 import useFetch from "../../hooks/useFetch";
 import { NavigationContext } from "../../navigation/SamsungNavigation";
 import Carousel from "../Carousel";
+import { useNavigate } from "react-router-dom";
 
 type Movies = {
   movieId: string;
@@ -11,6 +12,7 @@ type Movies = {
 };
 
 function MoviesList() {
+  const navigate = useNavigate();
   const { position, positionHandler } = useContext(NavigationContext);
   const { data, error } = useFetch<Movies[]>(
     "http://192.168.3.16:3000/api/movies"
@@ -28,7 +30,7 @@ function MoviesList() {
         colIdx === position.x && position.y === rowPosition
       }
       renderName={(item: Movies) => item.name}
-      onItemClick={() => console.log("dasdsadas")}
+      onItemClick={(row) => navigate(`/watch/movie/${row.movieId}`)}
     />
   );
 }

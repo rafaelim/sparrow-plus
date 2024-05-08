@@ -1,9 +1,11 @@
 import { useParams } from "react-router-dom";
 import PlayerComponent from "../../components/Player";
 import { BASE_URL } from "../../utils/constants";
+import useTizenBack from "../../hooks/tizen-navigation/useTizenBack";
 
 const MoviePlayer = () => {
   const { movieId } = useParams<{ movieId: string }>();
+  useTizenBack();
 
   const updateWatchStatus = (timestamp: number) => {
     const watchStatus = {

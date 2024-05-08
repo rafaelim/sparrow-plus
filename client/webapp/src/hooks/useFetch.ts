@@ -3,39 +3,24 @@
 import { useEffect, useState } from "react";
 
 const useFetch = <T>(url: string) => {
-  // const [error, setError] = useState();
-  const a = useState<T>();
-  console.log(a);
+  const [error, setError] = useState();
+  const [data, setData] = useState<T>();
+
   useEffect(() => {
-    // fetch(url)
-    //   .then((response) => response.json())
-    //   .then((data) => {
-    //     setData(data);
-    //   })
-    //   .catch((error) => {
-    //     setError(error);
-    //     return [];
-    //   });
+    fetch(url)
+      .then((response) => response.json())
+      .then((data) => {
+        setData(data);
+      })
+      .catch((error) => {
+        setError(error);
+        return [];
+      });
   }, [url]);
 
   return {
-    data: [
-      { name: "test" },
-      { name: "test" },
-      { name: "test" },
-      { name: "test" },
-      { name: "test" },
-      { name: "test" },
-      { name: "test" },
-      { name: "test" },
-      { name: "test" },
-      { name: "test" },
-      { name: "test" },
-      { name: "test" },
-      { name: "test" },
-      { name: "test" },
-    ] as any,
-    error: null,
+    data,
+    error,
   };
 };
 

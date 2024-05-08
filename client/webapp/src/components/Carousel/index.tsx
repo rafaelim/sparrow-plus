@@ -1,14 +1,8 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
 import placeholder from "../../assets/png/placeholder.png";
 import { useRef } from "react";
-import {
-  Card,
-  Container,
-  ListContainer,
-  Item,
-  ItemTitle,
-  Title,
-} from "./styled";
+import { Body, Container, ListContainer, Title } from "./styled";
+import Card from "../Card";
 
 type CarouselProps<T> = {
   label: string;
@@ -46,7 +40,7 @@ const Carousel = <T extends Record<string, unknown>>({
           }}
         >
           {virtualizer.getVirtualItems().map((virtualColumn) => (
-            <Card
+            <Body
               key={virtualColumn.key}
               data-index={virtualColumn.index}
               ref={virtualizer.measureElement}
@@ -58,18 +52,13 @@ const Carousel = <T extends Record<string, unknown>>({
                 transform: `translateX(${virtualColumn.start}px)`,
               }}
             >
-              <Item
+              <Card
                 onClick={() => onItemClick(items[virtualColumn.index])}
                 active={isPositionActive(virtualColumn.index)}
-              >
-                <img src={placeholder} alt="img" />
-                <div className="overlay">
-                  <ItemTitle>
-                    {renderName(items[virtualColumn.index])}
-                  </ItemTitle>
-                </div>
-              </Item>
-            </Card>
+                placeholderImage={placeholder}
+                title={renderName(items[virtualColumn.index])}
+              />
+            </Body>
           ))}
         </div>
       </ListContainer>

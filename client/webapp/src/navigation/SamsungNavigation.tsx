@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useMemo, useState } from "react";
 import PositionHandler from "./PositionHandler";
 import { useNavigate } from "react-router-dom";
 
@@ -13,12 +13,12 @@ const keyCodes = {
 
 type NavigationContextValues = {
   position: { x: number; y: number };
-  positionHandler: typeof PositionHandler;
+  positionHandler: PositionHandler;
 };
 
 export const NavigationContext = createContext<NavigationContextValues>({
   position: { x: 0, y: 0 },
-  positionHandler: PositionHandler,
+  positionHandler: new PositionHandler(),
 });
 
 type SamsungNavigationProps = {
@@ -29,26 +29,28 @@ function SamsungNavigation({ children }: SamsungNavigationProps) {
   const navigate = useNavigate();
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
+  const positionHandler = useMemo(() => new PositionHandler(), []);
+
   useEffect(() => {
     const listener = (evt: KeyboardEvent) => {
       switch (evt.keyCode) {
         case keyCodes.LEFT:
-          setPosition((pos) => ({ x: Math.min(0, position.x - 1), y: pos.y }));
+          setPosition((pos) => ({ x: Math.max(0, position.x - 1), y: pos.y }));
           break;
         case keyCodes.RIGHT:
           setPosition((pos) => ({ x: pos.x + 1, y: pos.y }));
           break;
         case keyCodes.UP:
-          setPosition((pos) => ({ x: pos.x, y: Math.min(0, pos.y - 1) }));
+          setPosition((pos) => ({ x: pos.x, y: Math.max(0, pos.y - 1) }));
           break;
         case keyCodes.DOWN:
           setPosition((pos) => ({
             x: pos.x,
-            y: Math.min(PositionHandler.getLastY(), pos.y + 1),
+            y: Math.min(positionHandler.getLastY(), pos.y + 1),
           }));
           break;
         case keyCodes.OK:
-          PositionHandler.triggerOpenEvent();
+          positionHandler.triggerOpenEvent();
           break;
         case keyCodes.BACK:
           navigate(-1);
@@ -63,12 +65,10 @@ function SamsungNavigation({ children }: SamsungNavigationProps) {
     return () => {
       window.removeEventListener("keydown", listener);
     };
-  });
+  }, [positionHandler, setPosition, position.x, navigate]);
 
   return (
-    <NavigationContext.Provider
-      value={{ position, positionHandler: PositionHandler }}
-    >
+    <NavigationContext.Provider value={{ position, positionHandler }}>
       {children}
     </NavigationContext.Provider>
   );
